@@ -1,0 +1,42 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.db
+.cache/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Chroma
+chroma_data/
+
+# Uploads
+backend/uploads/
+
+# Node
+node_modules/
+.next/
+out/
+.pnpm-store/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
