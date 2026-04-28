@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ReactFlow, Background, Node, Edge, MarkerType } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { NodeStates, NodeStatus, PipelineConfig } from "@/lib/types";
@@ -81,24 +81,48 @@ function buildEdges(config: PipelineConfig): Edge[] {
 }
 
 export function GraphDiagram({ nodeStates, config }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hasSize, setHasSize] = useState(false);
   const nodes = useMemo(() => buildNodes(nodeStates, config), [nodeStates, config]);
   const edges = useMemo(() => buildEdges(config), [config]);
 
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const updateSize = () => {
+      const { width, height } = element.getBoundingClientRect();
+      setHasSize(width > 0 && height > 0);
+    };
+
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="h-64 w-full rounded-lg border bg-card">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        fitView
-        nodesDraggable={false}
-        nodesConnectable={false}
-        zoomOnScroll={false}
-        panOnScroll={false}
-        panOnDrag={false}
-        proOptions={{ hideAttribution: true }}
-      >
-        <Background gap={20} size={1} />
-      </ReactFlow>
+    <div ref={containerRef} className="h-64 w-full rounded-lg border bg-card">
+      {hasSize ? (
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          fitView
+          nodesDraggable={false}
+          nodesConnectable={false}
+          zoomOnScroll={false}
+          panOnScroll={false}
+          panOnDrag={false}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background gap={20} size={1} />
+        </ReactFlow>
+      ) : (
+        <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+          Preparing pipeline graph...
+        </div>
+      )}
     </div>
   );
 }

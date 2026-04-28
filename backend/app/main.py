@@ -1,8 +1,17 @@
 import os
+import warnings
 from contextlib import asynccontextmanager
 
 # Must happen before any langchain/langgraph imports so the SDK picks them up
 from app.settings import settings
+
+# Suppress noisy LangChain/Pydantic serializer warning for structured output
+# where an internal `parsed` field is present during stream serialization.
+warnings.filterwarnings(
+    "ignore",
+    message=r"^Pydantic serializer warnings:.*",
+    category=UserWarning,
+)
 
 if settings.langsmith_api_key:
     os.environ["LANGSMITH_API_KEY"] = settings.langsmith_api_key
